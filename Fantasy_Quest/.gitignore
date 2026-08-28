@@ -1,1 +1,14 @@
 /bin/
+
+#Coisinhas do Eclipse
+.classpath
+.project
+.settings/
+
+#Arquivos temporários
+*.log
+*.tmp
+
+#SO
+.DS_Store
+Thumbs.db
