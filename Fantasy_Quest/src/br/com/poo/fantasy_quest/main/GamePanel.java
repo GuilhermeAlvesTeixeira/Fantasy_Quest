@@ -7,12 +7,14 @@ import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
+import br.com.poo.fantasy_quest.entity.Player;
+
 public class GamePanel extends JPanel implements Runnable{
 	//SCREEN SETTINGS
 	final int originalTitleSize = 16; //16x16 tile
 	final int scale = 3; // 3 * [16px, 16px]
 	
-	final int tileSize = originalTitleSize * scale; // 48x48 tile size
+	public final int tileSize = originalTitleSize * scale; // 48x48 tile size
 	
 	final int maxScreenCol = 16;
 	final int maxScreenRow = 12;
@@ -37,6 +39,13 @@ public class GamePanel extends JPanel implements Runnable{
      *  ::::::::::::::::::::::::::::::::::::::::::::::::::
     **/
 	Thread gameThread;
+	
+    /**
+     *  ::::::::::::::::::::::::::::::::::::::::::::::::::
+     *  ::::::::::::::::::: PLAYER :::::::::::::::::::::::
+     *  ::::::::::::::::::::::::::::::::::::::::::::::::::
+    **/
+	Player player = new Player(this, keyH);
 	
 	
 	//Set player's default position
@@ -69,24 +78,10 @@ public class GamePanel extends JPanel implements Runnable{
 	
 	public void update()
 	{	
-		// update char position
+		// RETIRAR DEPOIS
+		float deltaProvisorio = (float) (1.0 / 60.0);
 		
-		if(keyH.upPressed == true)
-		{
-			playerY -= playerSpeed;
-		}
-		else if(keyH.downPressed == true)
-		{
-			playerY += playerSpeed;
-		}
-		else if(keyH.leftPressed == true)
-		{
-			playerX -= playerSpeed;
-		}
-		else if(keyH.rightPressed == true)
-		{
-			playerX += playerSpeed;
-		}
+		player.update(deltaProvisorio);
 	}
 	
 	public void paintComponent(Graphics g)
@@ -96,8 +91,8 @@ public class GamePanel extends JPanel implements Runnable{
 		//changes graphics to graphics2D
 		Graphics2D g2 = (Graphics2D)g;
 		
-		g2.setColor(Color.white);
-		g2.fillRect(playerX, playerY, tileSize, tileSize);
+		player.draw(g2);
+		
 		g2.dispose();
 	}
 	
@@ -144,6 +139,7 @@ public class GamePanel extends JPanel implements Runnable{
 				drawCount++; // increase drawCounts!
 			}
 			
+			//check fps
 			if (timer >= 1_000_000_000) {System.out.println("FPS: " + drawCount); drawCount = 0; timer = 0;}
 		}
 	}
