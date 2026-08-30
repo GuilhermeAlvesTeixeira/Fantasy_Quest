@@ -7,11 +7,12 @@
 
 package br.com.poo.fantasy_quest.entity;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import br.com.poo.fantasy_quest.animation.Animator;
 
-public class Entity {
+public abstract class Entity {
 	
 	public int x, y;
 	public int speed;
@@ -24,5 +25,8 @@ public class Entity {
 	//public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2;
 	//public String direction;
 	
+    // deixei aqui os metodos abstratos, pq assim qualquer classe que derive de Entity poderá escrever suas próprias implementações
+	public abstract void update(double delta);
+	public abstract void draw(Graphics2D g2);
 	
 }
