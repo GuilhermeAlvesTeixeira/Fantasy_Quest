@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.poo.fantasy_quest.entity.Entity;
-import br.com.poo.fantasy_quest.main.KeyHandler;
 
 /**
  * @author inctr
@@ -19,13 +18,14 @@ import br.com.poo.fantasy_quest.main.KeyHandler;
 public class GameWorld 
 {
 	private final List<Entity> entities; //entidades do jogo. ex: player, monstros, sla etc
+	private final GameMap gameMap;
 	
 	//Ps de gambiarra: eu sei que não faz sentido GameWorld receber um keyHandler, mas dps eu refatoro
 	public GameWorld()
 	{	
 		//aqui adicionamos entidades ao ciclo de vida do construtor de GameWorld
 		entities = new ArrayList<>(); 
-		
+		gameMap = new GameMap();
 		//initEntities();
 	}
 	
@@ -56,7 +56,9 @@ public class GameWorld
 	}
 	
 	public void draw(Graphics2D g2)
-	{
+	{	
+		gameMap.draw(g2);
+		
 		for(Entity entity : entities)
 		{
 			entity.draw(g2);		
