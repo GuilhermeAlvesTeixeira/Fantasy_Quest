@@ -6,37 +6,37 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import br.com.poo.fantasy_quest.animation.AnimationState;
-//Animations
-import br.com.poo.fantasy_quest.animation.Animator;
 import br.com.poo.fantasy_quest.animation.SpriteAnimation;
-import br.com.poo.fantasy_quest.main.GamePanel;
+import br.com.poo.fantasy_quest.animation.enums.AnimationState;
+import br.com.poo.fantasy_quest.entity.enums.Direction;
+
+//import br.com.poo.fantasy_quest.animation.AnimationState;
+
+//import br.com.poo.fantasy_quest.animation.Animator;
+//import br.com.poo.fantasy_quest.animation.SpriteAnimation;
+//import br.com.poo.fantasy_quest.main.GamePanel;
+
+import br.com.poo.fantasy_quest.main.GameConfig;
 import br.com.poo.fantasy_quest.main.KeyHandler;
 
-public class Player extends Entity {
+public class Player extends DynamicEntity {
 	
-	GamePanel gp;
 	KeyHandler keyH;
 	
-	public Player(GamePanel gp, KeyHandler keyH)
+	public Player(KeyHandler keyH)
 	{
-		this.gp = gp;
 		this.keyH = keyH;
-		
-		animator = new Animator();
 		
 		setDefaultValues();
 		getPlayerImage(); // obs: usa animator
-		
-		
 	}
 	
 	public void setDefaultValues()
-	{
-		x = 100;
-		y = 100;
-		speed = 4;
-		direction = Direction.DOWN;
+	{	
+		this.setX(100);
+		this.setY(100);
+		this.setSpeed(4);
+		this.setDirection(Direction.DOWN);
 	}
 	
 	public void getPlayerImage()
@@ -60,7 +60,7 @@ public class Player extends Entity {
 			 * ::::::::::::::::::::::::::
 			 */
 			
-			animator.addAnimation(AnimationState.WALK,
+			this.getAnimator().addAnimation(AnimationState.WALK,
 					Direction.DOWN, 
 					new SpriteAnimation(0.15, 
 							sprites[0], 
@@ -75,7 +75,7 @@ public class Player extends Entity {
 			 * ::::::::::::::::::::::::::
 			 */
 			
-			animator.addAnimation(AnimationState.WALK,
+			this.getAnimator().addAnimation(AnimationState.WALK,
 					Direction.LEFT, 
 					new SpriteAnimation(0.15, 
 							sprites[4], 
@@ -90,7 +90,7 @@ public class Player extends Entity {
 			 * ::::::::::::::::::::::::::
 			 */
 			
-			animator.addAnimation(AnimationState.WALK,
+			this.getAnimator().addAnimation(AnimationState.WALK,
 					Direction.RIGHT, 
 					new SpriteAnimation(0.15, 
 							sprites[8], 
@@ -105,7 +105,7 @@ public class Player extends Entity {
 			 * ::::::::::::::::::::::::::
 			 */
 			
-			animator.addAnimation(AnimationState.WALK,
+			this.getAnimator().addAnimation(AnimationState.WALK,
 					Direction.UP, 
 					new SpriteAnimation(0.15, 
 							sprites[12], 
@@ -114,7 +114,7 @@ public class Player extends Entity {
 							sprites[15])
 					);
 			
-			animator.setState(AnimationState.WALK, Direction.DOWN);
+			this.getAnimator().setState(AnimationState.WALK, Direction.DOWN);
 			
 		}
 		catch (IOException e) 
@@ -127,43 +127,48 @@ public class Player extends Entity {
 	//alt shift + r
 	public void update(double delta)
 	{
-		// update char position
+		// TODO Auto-generated method stub
+		this.updateMovement();
+		
+		this.getAnimator().update(delta);
+		this.getAnimator().apply(this);
+	}
+	
+	public void updateMovement()
+	{	
+		//Agora que os atributos de Entity são privados, atualizamos os calculos com os getters
 		
 		if(keyH.upPressed == true)
 		{
-			y -= speed;
-			direction = Direction.UP;
-			
-			animator.setState(AnimationState.WALK, direction);
+			setY(getY() - getSpeed()); // feio, mas é a vida :P | y-= speed
+			setDirection(Direction.UP);
+			getAnimator().setState(AnimationState.WALK, getDirection());
 		}
 		else if(keyH.downPressed == true)
 		{
-			y += speed;
-			direction = Direction.DOWN;
-			
-			animator.setState(AnimationState.WALK, direction);
+			setY(getY() + getSpeed()); // feio, mas é a vida :P | y+= speed
+			setDirection(Direction.DOWN);
+			getAnimator().setState(AnimationState.WALK, getDirection());
 		}
 		else if(keyH.leftPressed == true)
 		{
-			x -= speed;
-			direction = Direction.LEFT;
-			
-			animator.setState(AnimationState.WALK, direction);
+			setX(getX() - getSpeed()); // feio, mas é a vida :P | x-= speed
+			setDirection(Direction.LEFT);
+			getAnimator().setState(AnimationState.WALK, getDirection());
 		}
 		else if(keyH.rightPressed == true)
 		{
-			x += speed;
-			direction = Direction.RIGHT;
-			
-			animator.setState(AnimationState.WALK, direction);
+			setX(getX() + getSpeed()); // feio, mas é a vida :P | x+= speed
+			setDirection(Direction.RIGHT);
+			getAnimator().setState(AnimationState.WALK, getDirection());
 		}
 		
-		animator.update(delta);
-		animator.apply(this);
 	}
 	
+	@Override
 	public void draw(Graphics2D g2)
-	{
-		g2.drawImage(sprite, x, y, gp.tileSize, gp.tileSize, null);
+	{	
+		// TODO Auto-generated method stub
+		g2.drawImage(this.getSprite(), this.getX(), this.getY(), GameConfig.TILE_SIZE, GameConfig.TILE_SIZE, null);
 	}
 }

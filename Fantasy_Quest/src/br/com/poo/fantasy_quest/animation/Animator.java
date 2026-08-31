@@ -3,8 +3,9 @@ package br.com.poo.fantasy_quest.animation;
 import java.util.HashMap;
 import java.util.Map;
 
-import br.com.poo.fantasy_quest.entity.Direction;
 import br.com.poo.fantasy_quest.entity.Entity;
+import br.com.poo.fantasy_quest.entity.enums.Direction;
+import br.com.poo.fantasy_quest.animation.enums.AnimationState;
 
 public class Animator {
 	

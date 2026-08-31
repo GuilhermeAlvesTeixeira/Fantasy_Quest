@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.poo.fantasy_quest.entity.Entity;
+import br.com.poo.fantasy_quest.main.KeyHandler;
 
 /**
  * @author inctr
@@ -17,14 +18,35 @@ import br.com.poo.fantasy_quest.entity.Entity;
  */
 public class GameWorld 
 {
-	private List<Entity> entities; //entidades do jogo. ex: player, monstros, sla etc
+	private final List<Entity> entities; //entidades do jogo. ex: player, monstros, sla etc
 	
+	//Ps de gambiarra: eu sei que não faz sentido GameWorld receber um keyHandler, mas dps eu refatoro
 	public GameWorld()
 	{	
-		//Adicionamos entidades ao ciclo de vida do construtor de GameWorld
+		//aqui adicionamos entidades ao ciclo de vida do construtor de GameWorld
 		entities = new ArrayList<>(); 
+		
+		//initEntities();
 	}
 	
+	/*
+	public void initEntities()
+	{		
+		//Player player = new Player(k);
+		//entities.add(player);
+	}
+	*/
+	
+	/*
+	public List<Entity> getEntities() {
+		return entities;
+	}
+
+	public void setEntities(List<Entity> entities) {
+		this.entities = entities;
+	}
+	*/
+
 	public void update(double delta)
 	{
 		for(Entity entity : entities)
@@ -38,6 +60,35 @@ public class GameWorld
 		for(Entity entity : entities)
 		{
 			entity.draw(g2);		
+		}
+	}
+	
+	/**
+	 * ::::::::::::::::::::::::::::::::::::::::
+	 * ::::::::::::::::::::::::::::::::::::::::
+	 */
+	
+	/**
+	 * Adiciona uma entidade ao mundo
+	 * @param entity
+	 */
+	public void addEntity(Entity entity)
+	{
+		if(entity != null)
+		{
+			entities.add(entity);
+		}
+	}
+	
+	/**
+	 * remove uma entidade do mundo
+	 * @param entity
+	 */	
+	public void removeEntity(Entity entity)
+	{
+		if(entity != null)
+		{
+			entities.remove(entity);
 		}
 	}
 	

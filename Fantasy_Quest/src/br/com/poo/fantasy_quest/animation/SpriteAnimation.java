@@ -40,7 +40,7 @@ public class SpriteAnimation implements Animation
 	@Override
 	public void apply(Entity entity) {
 		// TODO Auto-generated method stub
-		entity.sprite = frames[currentFrame];
+		entity.setSprite(frames[currentFrame]);
 	}
 	
 }

@@ -8,23 +8,22 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
 import br.com.poo.fantasy_quest.entity.Player;
+import br.com.poo.fantasy_quest.world.GameWorld;
 
 public class GamePanel extends JPanel implements Runnable{
 	//SCREEN SETTINGS
-	final int originalTitleSize = 16; //16x16 tile
-	final int scale = 3; // 3 * [16px, 16px]
+	final int originalTitleSize = GameConfig.ORIGINAL_TILE_SIZE; //16x16 tile
+	final int scale = GameConfig.SCALE; // 3 * [16px, 16px]
 	
-	public final int tileSize = originalTitleSize * scale; // 48x48 tile size
+	public final int tileSize = GameConfig.TILE_SIZE; // 48x48 tile size
 	
-	final int maxScreenCol = 16;
-	final int maxScreenRow = 12;
+	final int maxScreenCol = GameConfig.MAX_SCREEN_COL;
+	final int maxScreenRow = GameConfig.MAX_SCREEN_ROW;
 	
-	final int screenWidth = tileSize * maxScreenCol;  //768 pixels
-	final int screenHeight = tileSize * maxScreenRow; // 576 pixels
+	final int screenWidth = GameConfig.SCREEN_WIDTH;  //768 pixels
+	final int screenHeight = GameConfig.SCREEN_HEIGHT; // 576 pixels
 	
-	
-	//FPS
-	int FPS = 60;
+	private final GameWorld gameWorld; // privado. Não queremos que expor o mundo certo? vai que alguem apaga as entidades :P
 	
     /**
      *  ::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -42,19 +41,6 @@ public class GamePanel extends JPanel implements Runnable{
 	
     /**
      *  ::::::::::::::::::::::::::::::::::::::::::::::::::
-     *  ::::::::::::::::::: PLAYER :::::::::::::::::::::::
-     *  ::::::::::::::::::::::::::::::::::::::::::::::::::
-    **/
-	Player player = new Player(this, keyH);
-	
-	
-	//Set player's default position
-	int playerX     = 100;
-	int playerY     = 100;
-	int playerSpeed = 4;
-	
-    /**
-     *  ::::::::::::::::::::::::::::::::::::::::::::::::::
      *  :::::::::::::::: GAME PANEL :::::::::::::::::::::
      *  ::::::::::::::::::::::::::::::::::::::::::::::::::
     **/
@@ -67,6 +53,15 @@ public class GamePanel extends JPanel implements Runnable{
 		// key input
 		this.addKeyListener(keyH);
 		this.setFocusable(true); // <- Game Panel can be "focused" to receive key input 
+		
+		//ps: iniciar aqui as entidades
+		gameWorld = new GameWorld();
+		
+		/*
+		 * :::::::::: PLAYER ::::::::::::::;
+		 */
+		Player player = new Player(keyH);
+		gameWorld.addEntity(player);
 	
 	}
 	
@@ -76,12 +71,9 @@ public class GamePanel extends JPanel implements Runnable{
 		gameThread.start();
 	}
 	
-	public void update()
-	{	
-		// RETIRAR DEPOIS
-		float deltaProvisorio = (float) (1.0 / 60.0);
-		
-		player.update(deltaProvisorio);
+	public void update(double delta)
+	{
+		gameWorld.update(delta);
 	}
 	
 	public void paintComponent(Graphics g)
@@ -91,8 +83,8 @@ public class GamePanel extends JPanel implements Runnable{
 		//changes graphics to graphics2D
 		Graphics2D g2 = (Graphics2D)g;
 		
-		player.draw(g2);
-		
+		//player.draw(g2);
+		gameWorld.draw(g2);
 		g2.dispose();
 	}
 	
@@ -104,45 +96,75 @@ public class GamePanel extends JPanel implements Runnable{
      *  ::::::::::::::::::::::::::::::::::::::::::::::::::
     **/
 	
-	@Override 
+	@Override
 	public void run()
 	{	
-		double drawInterval = 1_000_000_000/FPS; //16,66 ms
-		double delta = 0;
 		long lastTime = System.nanoTime();
-		long currentTime;
-		
-		long timer = 0;
+		double acc = 0.0; //acumulador
 		int drawCount = 0;
 		
-		while (gameThread != null)
-		{	
-			currentTime = System.nanoTime();
-			
-			delta += (currentTime - lastTime) / drawInterval;
-			
-			//
-			timer += (currentTime - lastTime);
+		while(gameThread != null)
+		{
+			long currentTime = System.nanoTime();
+			double elapsedTime = (currentTime - lastTime) / 1_000_000_000.0;
 			
 			lastTime = currentTime;
 			
-			if (delta >= 1)
-			{
-				// 1. UPDATE: update information such as character positions
-				update();
-				
-				// 2. DRAW: draw the screen with the updated information
-				repaint(); // -- calls paintComponent method	
-				
-				delta--;
-				
-				drawCount++; // increase drawCounts!
-			}
+			acc += elapsedTime;
 			
-			//check fps
-			if (timer >= 1_000_000_000) {System.out.println("FPS: " + drawCount); drawCount = 0; timer = 0;}
+			while(acc >= GameConfig.TIME_STEP)
+			{
+				update(GameConfig.TIME_STEP);
+				acc -= GameConfig.TIME_STEP;
+			
+			}
+			repaint();
 		}
 	}
+	
+//	@Override 
+//	public void run()
+//	{	
+//		double drawInterval = 1_000_000_000/FPS; //16,66 ms
+//		double delta = 0;
+//		
+//		long lastTime = System.nanoTime();
+//		long currentTime;
+//		
+//		long timer = 0;
+//		int drawCount = 0;
+//		
+//		while (gameThread != null)
+//		{	
+//			currentTime = System.nanoTime();
+//			
+//			delta += (currentTime - lastTime) / drawInterval;
+//			
+//			//tempo real decorrido. PS: NAO TROCAR ISSO DAQUI PQ ANIMATOR UTILIZA
+//			//tenho que aprender fixed time stamp urgentemente
+//			double elapsed = (currentTime - lastTime) / 1_000_000_000.0;
+//			
+//			timer += (currentTime - lastTime);
+//			
+//			lastTime = currentTime;
+//			
+//			if (delta >= 1)
+//			{
+//				// 1. UPDATE: update information such as character positions
+//				update(delta);
+//				
+//				// 2. DRAW: draw the screen with the updated information
+//				repaint(); // -- calls paintComponent method	
+//				
+//				delta--;
+//				
+//				drawCount++; // increase drawCounts!
+//			}
+//			
+//			//check fps
+//			if (timer >= 1_000_000_000) {System.out.println("FPS: " + drawCount); drawCount = 0; timer = 0;}
+//		}
+//	}
 	
 
 //Ctrl + Shift + C --> Retira comentários
